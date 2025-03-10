@@ -2,11 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-rest-api/db"
 	"go-rest-api/models"
 	"net/http"
 )
 
 func main() {
+	db.InitDB()
 	server := gin.Default()
 	server.GET("/events", getEvents)
 	server.POST("/events", createEvent)
