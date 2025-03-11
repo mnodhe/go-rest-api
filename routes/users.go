@@ -13,15 +13,14 @@ func signup(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "could not parse request data.", "error": err.Error()})
 		return
 	}
-	email, err := user.GetUserByEmail(user.Email)
+	email, err := user.IsEmailExist(user.Email)
 	if err != nil {
 		return
 	}
-	if email != nil {
+	if email {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "email address is already exist."})
 		return
 	}
-
 	err = user.Save()
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "could not save user data.", "error": err.Error()})

@@ -2,6 +2,7 @@ package models
 
 import (
 	"go-rest-api/db"
+	"go-rest-api/utils"
 )
 
 type User struct {
@@ -17,7 +18,11 @@ func (u User) Save() error {
 		return err
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(u.Email, u.Password)
+	hashPassword, err := utils.HashPassword(u.Password)
+	if err != nil {
+		return err
+	}
+	result, err := stmt.Exec(u.Email, hashPassword)
 	if err != nil {
 		return err
 	}
@@ -36,4 +41,13 @@ func (u User) GetUserByEmail(id string) (*User, error) {
 		return nil, err
 	}
 	return &u, nil
+}
+func (u User) IsEmailExist(email string) (bool, error) {
+	query := "SELECT COUNT(*) FROM users WHERE email=?"
+	var count int
+	err := db.DB.QueryRow(query, email).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
