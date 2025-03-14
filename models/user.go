@@ -52,8 +52,8 @@ func (u User) IsEmailExist(email string) (bool, error) {
 	}
 	return count > 0, nil
 }
-func (u User) ValidateCredentials() error {
-	query := "SELECT id,password FROM users WHERE email = ?"
+func (u *User) ValidateCredentials() error {
+	query := "SELECT Id,password FROM users WHERE email = ?"
 	row := db.DB.QueryRow(query, u.Email)
 	var retrievedPassword string
 	err := row.Scan(&u.Id, &retrievedPassword)
