@@ -91,3 +91,33 @@ func (event Event) Delete() error {
 	}
 	return nil
 }
+func (e Event) Register(userId int64) error {
+	query := "INSERT INTO registrations(event_id,user_id) VALUES (?,?)"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(e.ID, userId)
+	return err
+
+}
+func (e Event) IsRegistrationExist(userId int64) (bool, error) {
+	query := "SELECT COUNT(*) FROM registrations WHERE user_id=? AND event_id=?"
+	var count int
+	err := db.DB.QueryRow(query, userId, e.ID).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+func (e Event) CancelRegistration(userId int64) error {
+	query := "DELETE FROM registrations WHERE user_id=? AND event_id=?"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(userId, e.ID)
+	return err
+}
